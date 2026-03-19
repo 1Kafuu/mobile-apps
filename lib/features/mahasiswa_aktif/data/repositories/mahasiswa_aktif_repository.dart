@@ -1,25 +1,27 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
 import '../models/mahasiswa_aktif.dart';
 
 class MahasiswaAktifRepository {
-  /// Mendapatkan daftar mahasiswa yang berstatus aktif saja
-  Future<List<MahasiswaAktifModel>> getMahasiswaAktifList() async {
-    // Simulasi network delay
-    await Future.delayed(const Duration(seconds: 1));
+  static const _baseUrl = 'https://jsonplaceholder.typicode.com';
 
-    // Data dummy mahasiswa aktif
-    return [
-      MahasiswaAktifModel(
-        nama: 'Ahmad Fauzi',
-        nim: '220411100010',
-        email: 'ahmad.fauzi@student.ac.id',
-        prodi: 'D4 Teknik Informatika',
-      ),
-      MahasiswaAktifModel(
-        nama: 'Larasati Putri',
-        nim: '220411100015',
-        email: 'larasati.p@student.ac.id',
-        prodi: 'D4 Teknik Informatika',
-      ),
-    ];
+  /// Mendapatkan daftar mahasiswa yang berstatus aktif saja dari API /posts
+  Future<List<MahasiswaAktifModel>> getMahasiswaAktifList() async {
+    final response = await http.get(Uri.parse('$_baseUrl/posts'));
+
+    if (response.statusCode != 200) {
+      throw Exception('Gagal memuat daftar posts (${response.statusCode})');
+    }
+
+    final data = jsonDecode(response.body);
+    if (data is! List) {
+      throw Exception('Format data tidak sesuai: diharapkan list posts');
+    }
+
+    return data
+        .cast<Map<String, dynamic>>()
+        .map((json) => MahasiswaAktifModel.fromJson(json))
+        .toList();
   }
 }

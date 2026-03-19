@@ -15,18 +15,35 @@ class MahasiswaListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (mahasiswaList.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.people_outline, size: 64, color: Colors.grey.shade400),
+            const SizedBox(height: 16),
+            const Text(
+              'Tidak ada data mahasiswa',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Tarik ke bawah untuk refresh',
+              style: TextStyle(color: Colors.grey),
+            ),
+          ],
+        ),
+      );
+    }
+
     return RefreshIndicator(
       onRefresh: () async => onRefresh(),
-      child: ListView.separated(
+      child: ListView.builder(
         padding: const EdgeInsets.all(16),
         itemCount: mahasiswaList.length,
-        separatorBuilder: (context, index) => const SizedBox(height: 12),
         itemBuilder: (context, index) {
           final mahasiswa = mahasiswaList[index];
-          return MahasiswaCard(
-            mahasiswa: mahasiswa,
-            isModern: useModernCard,
-          );
+          return MahasiswaCard(mahasiswa: mahasiswa, isModern: useModernCard);
         },
       ),
     );
@@ -45,53 +62,118 @@ class MahasiswaCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final gradientColors = [
+      Theme.of(context).primaryColor.withOpacity(0.16),
+      Theme.of(context).primaryColor.withOpacity(0.04),
+    ];
+
     return Container(
+      margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(isModern ? 16 : 4),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: gradientColors,
+        ),
+        borderRadius: BorderRadius.circular(isModern ? 18 : 12),
+        border: Border.all(
+          color: Theme.of(context).primaryColor.withOpacity(0.18),
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
+            blurRadius: 8,
             offset: const Offset(0, 4),
           ),
         ],
       ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        leading: CircleAvatar(
-          backgroundColor: Colors.blue.shade100,
-          child: Text(
-            mahasiswa.nama[0],
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-        ),
-        title: Text(
-          mahasiswa.nama,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('NIM: ${mahasiswa.nim}'),
-            Text(mahasiswa.jurusan),
-          ],
-        ),
-        trailing: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          decoration: BoxDecoration(
-            color: mahasiswa.isAktif ? Colors.green.shade50 : Colors.red.shade50,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: mahasiswa.isAktif ? Colors.green : Colors.red,
-            ),
-          ),
-          child: Text(
-            mahasiswa.isAktif ? 'Aktif' : 'Non-Aktif',
-            style: TextStyle(
-              fontSize: 12,
-              color: mahasiswa.isAktif ? Colors.green.shade700 : Colors.red.shade700,
-              fontWeight: FontWeight.bold,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(isModern ? 18 : 12),
+          onTap: () {},
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 52,
+                  height: 52,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).primaryColor,
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Center(
+                    child: Text(
+                      mahasiswa.nama.isNotEmpty
+                          ? mahasiswa.nama[0].toUpperCase()
+                          : '-',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        mahasiswa.nama,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'NIM: ${mahasiswa.nim}',
+                        style: const TextStyle(color: Colors.black87),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'Email: ${mahasiswa.email}',
+                        style: const TextStyle(color: Colors.black87),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        mahasiswa.jurusan,
+                        style: const TextStyle(color: Colors.black54),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: mahasiswa.isAktif
+                        ? Colors.green.shade50
+                        : Colors.red.shade50,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: mahasiswa.isAktif ? Colors.green : Colors.red,
+                    ),
+                  ),
+                  child: Text(
+                    mahasiswa.isAktif ? 'Aktif' : 'Non-Aktif',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: mahasiswa.isAktif
+                          ? Colors.green.shade700
+                          : Colors.red.shade700,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),

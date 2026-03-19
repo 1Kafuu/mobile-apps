@@ -1,46 +1,46 @@
+import 'dart:convert';
+
+import 'package:http/http.dart' as http;
+
 import '../models/mahasiswa_model.dart';
 
 class MahasiswaRepository {
-  /// Mendapatkan daftar mahasiswa aktif
-  Future<List<MahasiswaModel>> getMahasiswaList() async {
-    // Simulasi network delay
-    await Future.delayed(const Duration(seconds: 1));
+  static const _baseUrl = 'https://jsonplaceholder.typicode.com';
 
-    // Data dummy mahasiswa
-    return [
-      MahasiswaModel(
-        nama: 'Budi Santoso',
-        nim: '220411100001',
-        email: 'budi.santoso@example.com',
-        jurusan: 'Teknik Informatika',
-        isAktif: true,
-      ),
-      MahasiswaModel(
-        nama: 'Siti Aminah',
-        nim: '220411100002',
-        email: 'siti.aminah@example.com',
-        jurusan: 'Sistem Informasi',
-        isAktif: true,
-      ),
-      MahasiswaModel(
-        nama: 'Rizky Pratama',
-        nim: '220411100003',
-        email: 'rizky.p@example.com',
-        jurusan: 'Teknik Elektro',
-        isAktif: false,
-      ),
-    ];
+  /// Mendapatkan daftar mahasiswa dari JSONPlaceholder comments
+  Future<List<MahasiswaModel>> getMahasiswaList() async {
+    final response = await http.get(Uri.parse('$_baseUrl/comments'));
+
+    if (response.statusCode != 200) {
+      throw Exception(
+        'Gagal memuat daftar komentar dari API (${response.statusCode})',
+      );
+    }
+
+    final data = jsonDecode(response.body);
+    if (data is! List) {
+      throw Exception('Format data tidak sesuai (diharapkan list)');
+    }
+
+    return data
+        .cast<Map<String, dynamic>>()
+        .map((json) => MahasiswaModel.fromJson(json))
+        .toList();
   }
 
-  /// Mendapatkan data profil mahasiswa
+  /// Mendapatkan data profil mahasiswa dari JSONPlaceholder comment pertama
   Future<MahasiswaModel> getProfile() async {
-    await Future.delayed(const Duration(seconds: 1));
-    return MahasiswaModel(
-      nama: 'Profil User Mahasiswa',
-      nim: '220411100999',
-      email: 'my.profile@example.com',
-      jurusan: 'Teknik Informatika',
-      isAktif: true,
-    );
+    final response = await http.get(Uri.parse('$_baseUrl/comments/1'));
+
+    if (response.statusCode != 200) {
+      throw Exception('Gagal memuat profil dari API (${response.statusCode})');
+    }
+
+    final data = jsonDecode(response.body);
+    if (data is! Map<String, dynamic>) {
+      throw Exception('Format profil tidak sesuai (diharapkan object)');
+    }
+
+    return MahasiswaModel.fromJson(data);
   }
 }

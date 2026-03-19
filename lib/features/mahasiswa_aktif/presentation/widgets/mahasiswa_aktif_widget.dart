@@ -22,11 +22,26 @@ class MahasiswaAktifListView extends StatelessWidget {
           final item = listData[index];
           return Card(
             margin: const EdgeInsets.only(bottom: 12),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
             child: ListTile(
               leading: const CircleAvatar(child: Icon(Icons.person_outline)),
-              title: Text(item.nama, style: const TextStyle(fontWeight: FontWeight.bold)),
-              subtitle: Text('${item.nim} • ${item.prodi}'),
+              title: Text(
+                item.nama,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('NIM: ${item.nim}'),
+                  Text(
+                    item.prodi,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
               trailing: const Icon(Icons.check_circle, color: Colors.green),
             ),
           );

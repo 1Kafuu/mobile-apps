@@ -13,23 +13,33 @@ class MahasiswaModel {
     required this.isAktif,
   });
 
+  /// Mapped from JSONPlaceholder comments API
   factory MahasiswaModel.fromJson(Map<String, dynamic> json) {
+    final postId = json['postId'];
+    final id = json['id'];
+    final body = json['body'] ?? '';
+
     return MahasiswaModel(
-      nama: json['nama'] ?? '',
-      nim: json['nim'] ?? '',
-      email: json['email'] ?? '',
-      jurusan: json['jurusan'] ?? '',
-      isAktif: json['is_aktif'] ?? false,
+      nama: json['name']?.toString() ?? '',
+      nim: id?.toString() ?? '',
+      email: json['email']?.toString() ?? '',
+      jurusan: body.toString().split('\n').first,
+      isAktif:
+          (postId is int
+                  ? postId
+                  : int.tryParse(postId?.toString() ?? '0') ?? 0) %
+              2 ==
+          0,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'nama': nama,
-      'nim': nim,
+      'name': nama,
+      'id': nim,
       'email': email,
-      'jurusan': jurusan,
-      'is_aktif': isAktif,
+      'body': jurusan,
+      'postId_even': isAktif,
     };
   }
 }
