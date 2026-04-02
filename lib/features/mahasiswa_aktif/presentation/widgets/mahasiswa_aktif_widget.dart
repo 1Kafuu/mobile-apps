@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../data/models/mahasiswa_aktif.dart';
+import 'package:test_app/features/mahasiswa_aktif/data/models/mahasiswa_aktif.dart';
 
 class MahasiswaAktifListView extends StatelessWidget {
   final List<MahasiswaAktifModel> listData;

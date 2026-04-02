@@ -1,46 +1,36 @@
-import 'dart:convert';
-
-import 'package:http/http.dart' as http;
-
-import '../models/mahasiswa_model.dart';
+import 'package:test_app/core/network/dio_client.dart';
+import 'package:dio/dio.dart';
+import 'package:test_app/features/mahasiswa/data/models/mahasiswa_model.dart';
 
 class MahasiswaRepository {
-  static const _baseUrl = 'https://jsonplaceholder.typicode.com';
+  final DioClient _dioClient;
 
-  /// Mendapatkan daftar mahasiswa dari JSONPlaceholder comments
+  MahasiswaRepository({DioClient? dioClient})
+      : _dioClient = dioClient ?? DioClient();
+
+  /// get data daftar mahasiswa
   Future<List<MahasiswaModel>> getMahasiswaList() async {
-    final response = await http.get(Uri.parse('$_baseUrl/comments'));
-
-    if (response.statusCode != 200) {
+    try {
+      final Response response = await _dioClient.dio.get('/comments');
+      final List<dynamic> data = response.data;
+      return data.map((json) => MahasiswaModel.fromJson(json)).toList();
+    } on DioException catch (e) {
       throw Exception(
-        'Gagal memuat daftar komentar dari API (${response.statusCode})',
+        'Gagal memuat data mahasiswa: ${e.response?.statusCode} - ${e.message}',
       );
     }
-
-    final data = jsonDecode(response.body);
-    if (data is! List) {
-      throw Exception('Format data tidak sesuai (diharapkan list)');
-    }
-
-    return data
-        .cast<Map<String, dynamic>>()
-        .map((json) => MahasiswaModel.fromJson(json))
-        .toList();
   }
 
-  /// Mendapatkan data profil mahasiswa dari JSONPlaceholder comment pertama
+  /// get data profile mahasiswa
   Future<MahasiswaModel> getProfile() async {
-    final response = await http.get(Uri.parse('$_baseUrl/comments/1'));
-
-    if (response.statusCode != 200) {
-      throw Exception('Gagal memuat profil dari API (${response.statusCode})');
+    try {
+      final Response response = await _dioClient.dio.get('/comments/1');
+      final Map<String, dynamic> data = response.data;
+      return MahasiswaModel.fromJson(data);
+    } on DioException catch (e) {
+      throw Exception(
+        'Gagal memuat data profile: ${e.response?.statusCode} - ${e.message}',
+      );
     }
-
-    final data = jsonDecode(response.body);
-    if (data is! Map<String, dynamic>) {
-      throw Exception('Format profil tidak sesuai (diharapkan object)');
-    }
-
-    return MahasiswaModel.fromJson(data);
   }
 }

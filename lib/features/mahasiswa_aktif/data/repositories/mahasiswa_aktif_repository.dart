@@ -6,7 +6,6 @@ import '../models/mahasiswa_aktif.dart';
 class MahasiswaAktifRepository {
   static const _baseUrl = 'https://jsonplaceholder.typicode.com';
 
-  /// Mendapatkan daftar mahasiswa yang berstatus aktif saja dari API /posts
   Future<List<MahasiswaAktifModel>> getMahasiswaAktifList() async {
     final response = await http.get(Uri.parse('$_baseUrl/posts'));
 
